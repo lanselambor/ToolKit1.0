@@ -21,10 +21,10 @@ void Grove_Joint::initHardware()
   pinMode(KEY, INPUT);
   pinMode(PWR_HOLD, OUTPUT);   
   pinMode(LIGHT_SENSOR, INPUT);
+  pinMode(BATTERY_ADC, INPUT);
   
-  digitalWrite(PWR, HIGH);      //internal pull up 
-  digitalWrite(CHRG_LED, HIGH); //internal pull up  
-  digitalWrite(CHRG_LED, LOW);  //light up the red led
+  digitalWrite(PWR, LOW);      //power led  
+  digitalWrite(CHRG_LED, HIGH); 
   digitalWrite(PWR_HOLD, LOW);  //hold the power so the button can be used    
   
   AmbientLight = initLightSensor();
@@ -107,7 +107,7 @@ uint16_t Grove_Joint::checkButtonDown()
       while((HIGH==digitalRead(BUTTON)))
       {
         delayMicroseconds(998);
-        blockCountermillis++;       
+        blockCountermillis++;        
       }
       time_duration = blockCountermillis;
       ret = time_duration;
@@ -155,69 +155,83 @@ void Grove_Joint::softwareReset()
  * Return     :
  */
 
-int Grove_Joint::getBUTTON(void)
+int Grove_Joint::getPinNumberBUTTON(void)
 {
   return BUTTON;
 }
 
-int Grove_Joint::getLIGHT_SENSOR(void)
+int Grove_Joint::getPinNumberLIGHT_SENSOR(void)
 {
   return LIGHT_SENSOR;
 }
 
-int Grove_Joint::getCHRG_LED(void)
+int Grove_Joint::getPinNumberCHRG_LED(void)
 {
   return CHRG_LED;
 }
 
-int Grove_Joint::getPWR_HOLD(void)
+int Grove_Joint::getPinNumberPWR_HOLD(void)
 {
   return PWR_HOLD;
 }
 
-int Grove_Joint::getPWR(void)
+int Grove_Joint::getPinNumberPWR(void)
 {
   return PWR;
 }
 
-int Grove_Joint::getKEY(void)
+int Grove_Joint::getPinNumberKEY(void)
 {
   return KEY;
 }
 
-int Grove_Joint::getLED(void)
+int Grove_Joint::getPinNumberLED(void)
 {
   return LED;
 }
 
-int Grove_Joint::getOUT_PIN1(void)
+int Grove_Joint::getPinNumberOUT_PIN1(void)
 {
   return OUT_PIN1;
 }
 
-int Grove_Joint::getOUT_PIN2(void)
+int Grove_Joint::getPinNumberOUT_PIN2(void)
 {
   return OUT_PIN2;
 }
 
-int Grove_Joint::getIN_PIN1(void)
+int Grove_Joint::getPinNumberIN_PIN1(void)
 {
   return IN_PIN1;
 }
 
-int Grove_Joint::getIN_PIN2(void)
+int Grove_Joint::getPinNumberIN_PIN2(void)
 {
   return IN_PIN2;
 }
-#if 0
+
+int Grove_Joint::getPinNumberBATTERY_ADC(void)
+{
+  return BATTERY_ADC;
+}
+
+int Grove_Joint::getPinNumberBATTERY_LED(void)
+{
+  return BATTERY_LED;
+}
+
+int Grove_Joint::getBattery_value(void)
+{
+  return analogRead(BATTERY_ADC);
+}
+
 void Grove_Joint::settingStrongLightTrigger(bool mode)
 {
-  if(false == mode)     STRONG_LIGHT_TRIGGER = false;
-  else                  STRONG_LIGHT_TRIGGER = true;
+  STRONG_LIGHT_TRIGGER = mode;  
 }
+
 bool Grove_Joint::isStrongLightTrigger()
 {
   return STRONG_LIGHT_TRIGGER;
 }
-#endif
 /* --------------end of file ------------------ */

@@ -1,7 +1,7 @@
 #ifndef _GROVEJOINT_H_
 #define _GROVEJOINT_H_
 
-#define DEBUG          1
+#define DEBUG          0
 #define LOG(message)   Serial.print("[ ");       \
                        Serial.print(millis());   \
                        Serial.print(" ms] ");    \
@@ -70,21 +70,30 @@ class Grove_Joint
      * Return     :
      */
      
-    int getBUTTON(void);  
-    int getLIGHT_SENSOR(void);
-    int getCHRG_LED(void);
-    int getPWR_HOLD(void);
-    int getPWR(void);
-    int getKEY(void);
-    int getLED(void);
-    int getOUT_PIN1(void);
-    int getOUT_PIN2(void);
-    int getIN_PIN1(void);
-    int getIN_PIN2(void);
-#if 0    
+    int getPinNumberBUTTON(void);  
+    int getPinNumberLIGHT_SENSOR(void);
+    int getPinNumberCHRG_LED(void);
+    int getPinNumberPWR_HOLD(void);
+    int getPinNumberPWR(void);
+    int getPinNumberKEY(void);
+    int getPinNumberLED(void);
+    int getPinNumberOUT_PIN1(void);
+    int getPinNumberOUT_PIN2(void);
+    int getPinNumberIN_PIN1(void);
+    int getPinNumberIN_PIN2(void);
+    int getPinNumberBATTERY_ADC(void);
+    int getPinNumberBATTERY_LED(void);
+    
+    /* Function   : getBattery_value(void)
+     * Description: 
+     * Parameter  : 
+     * Return     : Battery value
+     */
+    int getBattery_value(void);
+   
     void settingStrongLightTrigger(bool mode = false);
     bool isStrongLightTrigger();
-#endif    
+
   private:
     //hardware IO definition                              
     int BUTTON       = 2;
@@ -98,6 +107,8 @@ class Grove_Joint
     int OUT_PIN2     = 5;
     int IN_PIN1      = A5;  //normal input pin
     int IN_PIN2      = A4;
+    int BATTERY_ADC  = A2;
+    int BATTERY_LED  = A3;
     
     bool STRONG_LIGHT_TRIGGER = false;
 };
