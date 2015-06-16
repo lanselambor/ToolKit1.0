@@ -37,8 +37,10 @@ void Grove_Joint::initHardware()
   delay(500);
   analogWrite(LED, 5);
   delay(500);
-  analogWrite(LED, 0); 
-  
+  analogWrite(LED, 0);
+
+  //get battery level
+  BatteryLevel =  getBatteryLevel();         
 }
 
 /* Function   : int initLightSensor(void)
@@ -99,12 +101,12 @@ uint16_t Grove_Joint::checkButtonDown()
   uint16_t blockCountermillis = 0;
   uint16_t time_duration = 0;
   
-  if((HIGH==digitalRead(BUTTON)))
+  if((HIGH==digitalRead(KEY)))
   {
     delay(5);
-    if((HIGH==digitalRead(BUTTON)))
+    if((HIGH==digitalRead(KEY)))
     {      
-      while((HIGH==digitalRead(BUTTON)))
+      while((HIGH==digitalRead(KEY)))
       {
         delayMicroseconds(998);
         blockCountermillis++;        
@@ -131,11 +133,11 @@ void Grove_Joint::powerOff()
 {
   detachInterrupt(0);  
   digitalWrite(PWR_HOLD, HIGH);	      
-  pinMode(BUTTON, OUTPUT);    
-  digitalWrite(BUTTON, LOW);    
+  pinMode(KEY, OUTPUT);    
+  digitalWrite(KEY, LOW);    
   delay(20);
-  digitalWrite(BUTTON, HIGH);  
-  pinMode(BUTTON, INPUT);    
+  digitalWrite(KEY, HIGH);  
+  //pinMode(KEY, INPUT);    
 
 }
 
@@ -157,7 +159,7 @@ void Grove_Joint::softwareReset()
 
 int Grove_Joint::getPinNumberBUTTON(void)
 {
-  return BUTTON;
+  return KEY;
 }
 
 int Grove_Joint::getPinNumberLIGHT_SENSOR(void)
@@ -220,11 +222,43 @@ int Grove_Joint::getPinNumberBATTERY_LED(void)
   return BATTERY_LED;
 }
 
-int Grove_Joint::getBattery_value(void)
+float Grove_Joint::getBatteryLevel(void)
 {
-  return analogRead(BATTERY_ADC);
+  long tmp = 0;
+  for(int i=0;i<50;i++)
+  {
+    tmp += analogRead(BATTERY_ADC);
+  }
+  return (float)tmp/50.0/BatteryAnalogRatio;
 }
 
+float Grove_Joint::BatteryManager(void)
+{  
+  static bool ledFlip = false;
+  static long clock = millis();
+  
+  BatteryLevel = BatteryLevel * 0.6 + getBatteryLevel() * 0.4;  
+  
+  if(BatteryLevel <= LowPowerValue) 
+  {    
+    if(millis()-clock >= 100)
+    {
+      clock = millis();
+      ledFlip ^= 1;
+    }
+    batteryLedOn(ledFlip);       
+  }
+  else
+  {
+    batteryLedOn(OFF);
+  }
+  if(BatteryLevel <= DangerPowerValue)
+  {
+    batteryLedOn(ON);
+    powerOff();    
+  }
+  return BatteryLevel;
+}
 void Grove_Joint::settingStrongLightTrigger(bool mode)
 {
   STRONG_LIGHT_TRIGGER = mode;  
@@ -233,5 +267,10 @@ void Grove_Joint::settingStrongLightTrigger(bool mode)
 bool Grove_Joint::isStrongLightTrigger()
 {
   return STRONG_LIGHT_TRIGGER;
+}
+
+void Grove_Joint::batteryLedOn(bool on_off)
+{
+  digitalWrite(BATTERY_LED, !on_off);
 }
 /* --------------end of file ------------------ */

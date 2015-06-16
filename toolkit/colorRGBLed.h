@@ -3,10 +3,11 @@
 
 #include "GroveColorSensor.h"
 #include "Adafruit_NeoPixel.h"
+#include "WatchDog.h"
 
 class MyColorSensor : public GroveColorSensor
 {
-  public:
+  public:   	    
     int r, g, b, c;
     void readRGB()
     {
@@ -40,7 +41,12 @@ void colorRGBLed()
 {
   static bool initialized = false;
   int ledNum = 20;
-
+  
+  //Watchdog 
+  WTD.watchdogSetup();
+  WTD.doggieTickle();
+  WTD.enableWatchDog();
+  
   Adafruit_NeoPixel pixels = Adafruit_NeoPixel(ledNum, 3, NEO_GRB + NEO_KHZ800);
   pixels.begin();
   MyColorSensor colorSensor;
@@ -56,6 +62,8 @@ void colorRGBLed()
     colorSensor.clearInterrupt();
   }    
   
+  //disableWatchDog
+  WTD.disableWatchDog();
 }
 
 #endif

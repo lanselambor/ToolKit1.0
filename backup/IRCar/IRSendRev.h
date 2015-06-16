@@ -23,8 +23,6 @@
 #ifndef _IRSENDREV_H_
 #define _IRSENDREV_H_
 
-#include "Tone.h"
-#include "common.h"
 
 // len, start_H, start_L, nshort, nlong, data_len, data[data_len]....
 #define D_LEN       0

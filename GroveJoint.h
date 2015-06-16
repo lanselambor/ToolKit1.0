@@ -12,6 +12,9 @@
                                     Serial.print(" ms] ");    \
                                     Serial.print(message);    \
                                     Serial.println(value);
+#define  ON  1
+#define  OFF 0
+                                    
 class Grove_Joint
 {
   public:
@@ -68,8 +71,7 @@ class Grove_Joint
      * Description: return pins on joint board
      * Parameter  : 
      * Return     :
-     */
-     
+     */     
     int getPinNumberBUTTON(void);  
     int getPinNumberLIGHT_SENSOR(void);
     int getPinNumberCHRG_LED(void);
@@ -89,14 +91,15 @@ class Grove_Joint
      * Parameter  : 
      * Return     : Battery value
      */
-    int getBattery_value(void);
+    float getBatteryLevel(void);
+    float BatteryManager(void);
    
     void settingStrongLightTrigger(bool mode = false);
     bool isStrongLightTrigger();
-
+    void batteryLedOn(bool on_off);
+    
   private:
     //hardware IO definition                              
-    int BUTTON       = 2;
     int LIGHT_SENSOR = A0;
     int CHRG_LED     = A3;  //low-level work
     int PWR_HOLD     = A1;  
@@ -109,6 +112,11 @@ class Grove_Joint
     int IN_PIN2      = A4;
     int BATTERY_ADC  = A2;
     int BATTERY_LED  = A3;
+    
+    const float LowPowerValue      = 3.40;    //3.4V
+    const float DangerPowerValue   = 3.30;    //3.3V
+    const float BatteryAnalogRatio = 214.0;    //ratio = (analogue value) / (battery level);
+    float BatteryLevel;
     
     bool STRONG_LIGHT_TRIGGER = false;
 };

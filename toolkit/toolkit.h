@@ -12,8 +12,15 @@
 #include "logicAnd.h"
 #include "logicOr.h"
 #include "logicNot.h"
-#include "UltrasonicTones.h"
+//#include "UltrasonicTones.h"
 #include "colorRGBLed.h"
+#include "airDustBox.h"
+#include "digitalSandClock.h"
+#include "pirNightLed.h"
+#include "coinCounter.h"
+#include "IRCarReceive.h"
+#include "analogMotor.h"
+#include "airPiano.h"
 
 #define DEBUG          1
 #define LOG(message)   Serial.print("[ ");       \
@@ -34,14 +41,15 @@
 #define BUTTON_NORMAL_PRESS      1000 //1000ms
 #define BUTTON_LONG_PRESS        3000 //3000ms
 #define EXCEPTION_PROGRAM_NUMBER 99
+#define TOTAL_PROGRAM_NUMBER     12
 
-Grove_Joint joint;
+
 TM1637 tm1637(joint.getPinNumberOUT_PIN1(), joint.getPinNumberOUT_PIN2());
     
 extern volatile bool Interrupt_0_flag = false;
 extern volatile bool PowerOffFlag = false;
 
-/* -----------Function Declare------------ */
+/* -----------Functions ------------ */
 void loopEnable(int programNumber);
 int programConfig(int downDuration);
 uint16_t checkJointButtonDown();
@@ -53,6 +61,7 @@ void saveProgramNumberToEeprom(int number);
 int readProgramNumberFromEeprom();
 void showNumberTo4DigitDisplay(int number);
 void enablePowerOffFlag();
+void batteryManager();
 
 /* Function   : void keyRoutine()
  * Description: deal with key action
@@ -61,8 +70,10 @@ void enablePowerOffFlag();
  */
 void keyRoutine()
 {
+  cli();
   Interrupt_0_flag = true;
-  programConfigLedOn(0);
+  programConfigLedOn(OFF);
+  sei();
 }
 
 /* Function   : programConfig(int config)
@@ -73,7 +84,7 @@ void keyRoutine()
 int programConfig(int downDuration)
 {
   int ret = NULL;  
-  programConfigLedOn(1);
+  programConfigLedOn(ON);
   if(downDuration <= BUTTON_SHORT_PRESS)  //POWER_OFF
   {
     #if DEBUG
@@ -104,18 +115,25 @@ int programConfig(int downDuration)
       if(joint.isLightSensorTriggered())
       {
 #endif
+        //shine once
+        programConfigLedOn(ON);
+        delay(100);
+        programConfigLedOn(OFF);
+        
         programNumber++;
-        if(programNumber > 16) programNumber = 0;
-        showNumberTo4DigitDisplay(programNumber);        
+        if(programNumber > TOTAL_PROGRAM_NUMBER) programNumber = 1;
+        //showNumberTo4DigitDisplay(programNumber);        
       }
+      showNumberTo4DigitDisplay(programNumber);
+      #if DEBUG
       LOG_VALUE("Configuring program number is ", programNumber);
+      #endif
       delay(1000);
     }    
     ret = programNumber;
   }
-  programConfigLedOn(0);
-  return ret;
-  
+  programConfigLedOn(OFF);
+  return ret;  
 }
 
 uint16_t checkJointButtonDown()
@@ -135,7 +153,7 @@ uint16_t checkJointButtonDown()
         blockCountermillis++; 
         if(blockCountermillis > BUTTON_NORMAL_PRESS)
         {
-          programConfigLedOn(1);
+          programConfigLedOn(ON);
         }
       }
       time_duration = blockCountermillis;
@@ -186,14 +204,19 @@ void programConfigLedOn(int status)
     analogWrite(joint.getPinNumberLED(), 0);
   }
   else{
-    analogWrite(joint.getPinNumberLED(), 10);
+    analogWrite(joint.getPinNumberLED(), 5);
   }
 }
 
 void programConfigLedBlink()
 {
-  static int LedStatus = 1;
-  LedStatus = !LedStatus;
+  static bool LedStatus = false;
+  static long clock = millis();
+  if(millis() - clock >= 200)
+  {
+    clock = millis();
+    LedStatus ^= 0x1;
+  }
   programConfigLedOn(LedStatus);
 }
 
@@ -212,20 +235,41 @@ void showNumberTo4DigitDisplay(int number)
   int tens = 0;
   int units = 0;  
   
+  TM1637 tm1637(joint.getPinNumberOUT_PIN1(), joint.getPinNumberOUT_PIN2());  
   tm1637.init();
   tm1637.set(BRIGHT_TYPICAL);    
   tm1637.point(false);
   tm1637.clearDisplay();
     
   tens = number / 10;
-  units = number % 10;                       
-  tm1637.display(2,tens);
+  units = number % 10;
+  if(tens != 0) 
+  {
+    tm1637.display(2,tens);
+  }
   tm1637.display(3,units);  
 }
 
 void enablePowerOffFlag()
 {
   PowerOffFlag = true;
+}
+
+void batteryManager()
+{
+  static long clock = millis();
+  
+  if( (millis()-clock) > 500)
+  {
+    clock = millis();
+    //Battery detecting and protecting 
+    float battery = joint.BatteryManager();
+    //float battery = joint.getBatteryLevel();
+    
+    #if DEBUG
+    LOG_VALUE("battery is ", battery); 
+    #endif   
+  }
 }
 #endif
 
