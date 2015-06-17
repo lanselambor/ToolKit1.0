@@ -21,6 +21,10 @@
 #include "IRCarReceive.h"
 #include "analogMotor.h"
 #include "airPiano.h"
+//#include "groot.h"
+#include "CupWad.h"
+#include "moistureRgbLed.h"
+#include "loudnessRgbLed.h"
 
 #define DEBUG          1
 #define LOG(message)   Serial.print("[ ");       \
@@ -41,7 +45,7 @@
 #define BUTTON_NORMAL_PRESS      1000 //1000ms
 #define BUTTON_LONG_PRESS        3000 //3000ms
 #define EXCEPTION_PROGRAM_NUMBER 99
-#define TOTAL_PROGRAM_NUMBER     12
+#define TOTAL_PROGRAM_NUMBER     15
 
 
 TM1637 tm1637(joint.getPinNumberOUT_PIN1(), joint.getPinNumberOUT_PIN2());

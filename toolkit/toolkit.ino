@@ -4,7 +4,12 @@
 #include <EEPROM.h>
 #include <Wire.h>
 #include "toolkit.h"
+#include <Servo.h>
 
+//Groot groot;
+CupWad cupWad;
+MoistureRgbLed moistureRgbLed;
+LoudnessRgbLed loudnessRgbLed;
 
 void setup() 
 {      
@@ -81,7 +86,15 @@ void loop()
       case 12:
         analogMotor();      
         break;
-        
+      case 13:
+        cupWad.run();        
+        break;
+      case 14: 
+        moistureRgbLed.run();
+        break;
+      case 15:
+        loudnessRgbLed.run();
+        break;
       default:
         break;
     }    
